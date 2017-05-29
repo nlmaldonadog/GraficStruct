@@ -16,6 +16,9 @@ rojo = (239,57,24)
 amarillo = (255,255,0)
 dimensionScreen = (1200,700)
 
+global hayError 
+hayError = False
+
 pygame.init()
 pygame.display.set_caption("Graficador de Estructuras")
 ventana = pygame.display.set_mode(dimensionScreen)
@@ -330,9 +333,20 @@ def abs( a ):
 class MyVisitor(MyLanguageVisitor):
 
 	def visitCommands(self, ctx):
+		global hayError
+		if hayError:
+			hayError = True
+			return None
 		return self.visitChildren(ctx)
 
 	def visitCommand(self, ctx):
+		global hayError
+		texto = ctx.getText();
+		print ctx.getText()
+		if "missing" in texto or hayError :
+			hayError = True
+			return None
+		print ctx.getText()	
 		return self.visitChildren(ctx)
 
 	# Visit a parse tree produced by MyLanguageParser#declaration.
