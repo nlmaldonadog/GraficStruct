@@ -17,7 +17,7 @@ endif
 struct queue1 = new queue;
 struct stack1 = new stack;
 struct list1 = new list;
-struct list2 = new stack;
+struct stack2 = new stack;
 
 print pi;
 stack1..put( 1 );
@@ -25,9 +25,12 @@ stack1..put( 1 );
 queue1..put( 1 );
 list1..insert( 0, 1 );
 print stack1..len();
-print list2..len();
+print stack2..len();
 print stack1..take();
 print queue1..len();
 repeat 10 times
 	list1..insert( 0, pi );
 endrepeat
+
+struct stack3 = new stack;
+stack3..put( 1 );
