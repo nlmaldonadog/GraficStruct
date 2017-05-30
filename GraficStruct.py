@@ -338,11 +338,15 @@ class MyVisitor(MyLanguageVisitor):
 	# Visit a parse tree produced by MyLanguageParser#declaration.
 	def visitDeclaration(self, ctx):
 		name = ctx.ID().getText()
-		if table.get( name ) != None:
-			line = ctx.ID().getSymbol().line
-			col = ctx.ID().getSymbol().column
-			print "<" + str( line ) + ", " + str( col ) + ">Error Semantico, la variable con nombre: \"" + name + "\" ya fue declarada.\n"
-			sys.exit()
+		if name in table:
+			if table[ name ] in structures:
+				line = ctx.ID().getSymbol().line
+				col = ctx.ID().getSymbol().column
+				print "<" + str( line ) + ", " + str( col ) + ">Error Semantico, la variable con nombre: \"" + name + "\" ya pertenece a alguna estructura.\n"
+				sys.exit()
+			else:
+				if ctx.VAR() != None:
+					table[ name ] = self.visitExpr( ctx.expr() )
 		else:
 			if ctx.VAR() != None:
 				table[ name ] = self.visitExpr( ctx.expr() )

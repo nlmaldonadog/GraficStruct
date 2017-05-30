@@ -29,8 +29,10 @@ print stack2..len();
 print stack1..take();
 print queue1..len();
 repeat 10 times
-	list1..insert( 0, pi );
+	var x as ( pi + x );
+	list1..insert( 0, x );
 endrepeat
 
 struct stack3 = new stack;
 stack3..put( 1 );
+var stack3 as 2;
