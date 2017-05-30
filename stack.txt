@@ -1,0 +1,16 @@
+struct stack1 = new stack;
+stack1..put( 1 );
+struct stack2 = new stack;
+stack2..put( 1 );
+struct stack3 = new stack;
+stack3..put( 1 );
+struct stack4 = new stack;
+stack4..put( 1 );
+struct stack5 = new stack;
+stack5..put( 1 );
+struct stack6 = new stack;
+stack6..put( 1 );
+struct stack7 = new stack;
+stack7..put( 1 );
+struct stack8 = new stack;
+stack8..put( 1 );

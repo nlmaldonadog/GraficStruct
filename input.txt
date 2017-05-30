@@ -43,11 +43,13 @@ print queue1..len();
 
 list3..insert( 1 , 42 ) ;
 
-repeat 30 times
+repeat 70 times
 	var x as ( pi + x );
 	list1..insert( x, pi + x );
 endrepeat
 
+list1..remove( 5 );
+list1..remove( 8 );
 struct stack3 = new stack;
 stack3..put( 1 );
 print queue1..take();

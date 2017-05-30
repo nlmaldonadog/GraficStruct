@@ -19,6 +19,9 @@ dimensionScreen = (1200,700)
 global hayError 
 hayError = False
 
+global renglones
+renglones = []
+
 pygame.init()
 pygame.display.set_caption("Graficador de Estructuras")
 ventana = pygame.display.set_mode(dimensionScreen)
@@ -38,21 +41,6 @@ LISTAS = {}
 structures = [ 'stack', 'list', 'queue' ]
 
 table = {}
-
-#PARTE DE MOSTRAR EL CODIGO
-input = open("input.txt","r")
-fuente = pygame.font.SysFont("courier",18)
-#renderizar el string directamente en la superficie codigo
-renglones = []
-indice = 0
-for line in input.readlines():
-	result = str()
-	for c in line:
-		if c == '\t':
-			result += '    ';
-		else:
-			result += c
-	renglones.append(fuente.render( "     "+result[0:len(result)-1] ,0 , blanco))
 
 def pintarCodigo( limMenor , limMayor , renglon):
 	j=0
@@ -80,7 +68,7 @@ def actualizarCodigo(renglon):
 		else:
 			pintarCodigo(renglon-7 , renglon+7 , renglon)
 	pygame.display.update()
-	time.sleep(0.3)
+	time.sleep(0.15)
 
 class Pila:
 	def __init__(self,superficie):
@@ -245,17 +233,26 @@ class Lista:
 		self.superficie.fill(color)
 		length = len(self.lista)
 		letra = pygame.font.SysFont("Arial",10)
+		cajitas = (self.superficie.get_width()-15)/self.dimensionCaja[0]
+		cantidadRenglones = length/cajitas + 1
 		#marco
 		dx = 15
 		dy = 0
 		index = 0
+		#if self.dimensionCaja[1] != 40 and cantidadRenglones*(self.dimensionCaja[1]+15) < self.superficie.get_height():
+			#self.dimensionCaja = (self.dimensionCaja[0],self.dimensionCaja[1]+7)
+
+		if (self.dimensionCaja[1] + 15)*cantidadRenglones > self.superficie.get_height():
+			self.dimensionCaja = (self.dimensionCaja[0],self.dimensionCaja[1]-7)
+
 		for caja in self.lista:
 			#si ya se paso del limite derecho de la superficie
 			if dx+self.dimensionCaja[0] > self.superficie.get_width():
-				dy += 20+self.dimensionCaja[1]
+				dy += 15+self.dimensionCaja[1]
 				dx = 15
+			#cambiar dimensiones de caja
 			r = pygame.draw.rect(self.superficie, negro , (dx,dy,self.dimensionCaja[0],self.dimensionCaja[1]),1)
-			dx +=self.dimensionCaja[1]
+			dx +=self.dimensionCaja[0]
 			cont = letra.render(str(caja) , 0 , negro )
 			anchoLetra = cont.get_width()
 			idx = letra.render(str(index) , 0 ,negro)
@@ -271,7 +268,7 @@ class Lista:
 				idx = letra.render(str(index) , 0 ,negro)
 				xt = idx.get_width()
 				self.superficie.blit( cont , ( r[0]+(self.dimensionCaja[0]-anchoLetra)/2 , r[1] + self.dimensionCaja[1]/4 ) )
-
+		
 		pygame.display.update()
 
 	def add(self,index,texto):
@@ -280,7 +277,7 @@ class Lista:
 
 	def remove(self , index):
 		if index > 0 and index < len(self.lista)-1:
-			self.cola.pop(index)
+			self.lista.pop( int( index ) )
 			self.pintar(amarillo)
 			return True
 		else:
@@ -309,6 +306,7 @@ def reorganizarListas():
 		nuevoCanvas = canvas.subsurface( x , y+(dy+20)*LISTAS[lista][1] , dx , dy  )
 		nuevaLista = Lista(nuevoCanvas)
 		nuevaLista.lista = LISTAS[lista][0].lista
+		nuevaLista.dimensionCaja = LISTAS[lista][0].dimensionCaja
 		letra = pygame.font.SysFont("Arial",18,False,True)
 		nameLista = letra.render( LISTAS[lista][2] , 0 , negro)
 		xt = nameLista.get_width()
@@ -331,9 +329,6 @@ def newLista(name):
 	canvasLista = canvas.subsurface( x , y+numListas*dy + 20, dx , dy )
 	canvasLista.fill(blanco)
 	letra = pygame.font.SysFont("Arial",18,False,True)
-	nameLista = letra.render(name , 0 , negro)
-	xtexto = nameLista.get_width()
-	canvas.blit(nameLista , ( (dx-xtexto)/2 , y+numListas*dy ) )
 	LISTAS[name]=[ Lista(canvasLista) , numListas , name ]
 
 	reorganizarListas()
@@ -365,6 +360,7 @@ def reorganizarColas():
 		nuevoCanvas = canvas.subsurface(numPilas,index*60,anchura,altura)
 		nuevaCola = Cola(nuevoCanvas)
 		nuevaCola.cola = COLAS[cola][0].cola
+		nuevaCola.dimensionCaja = COLAS[ cola ][ 0 ].dimensionCaja
 		COLAS[cola][0]=nuevaCola
 		COLAS[cola][0].pintar()
 	pygame.display.update()
@@ -403,7 +399,6 @@ class MyVisitor(MyLanguageVisitor):
 		if "missing" in texto or hayError :
 			hayError = True
 			return None
-		print ctx.getText()	
 		return self.visitChildren(ctx)
 
 	# Visit a parse tree produced by MyLanguageParser#declaration.
@@ -495,7 +490,7 @@ class MyVisitor(MyLanguageVisitor):
 						actualizarCodigo(ctx.methods().vardos().MTH().getSymbol().line - 1)
 					elif ctx.methods().vardos().REM() != None:
 						if table[ name ] == 'list':
-							LISTAS[ name ][ 0 ].remove( ctx.methods().expr() )
+							LISTAS[ name ][ 0 ].remove( self.visitExpr( ctx.methods().expr(0) ) )
 						else:
 							line = ctx.methods().vardos().MTH().getSymbol().line
 							col = ctx.methods().vardos().MTH().getSymbol().column
@@ -629,6 +624,22 @@ class MyVisitor(MyLanguageVisitor):
 			return ans
 
 def main(argv):
+
+	#PARTE DE MOSTRAR EL CODIGO
+	inp = open(argv[1],"r")
+	fuente = pygame.font.SysFont("courier",18)
+	global renglones
+	#renderizar el string directamente en la superficie codigo
+	indice = 0
+	for line in inp.readlines():
+		result = str()
+		for c in line:
+			if c == '\t':
+				result += '    ';
+			else:
+				result += c
+		renglones.append(fuente.render( "     "+result[0:len(result)-1] ,0 , blanco))
+
 	input = FileStream(argv[1])
 	lexer = MyLanguageLexer(input)
 	stream = CommonTokenStream(lexer)
