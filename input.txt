@@ -1,8 +1,8 @@
-/*
+
 var pi as 3.1415;
 var x as 1;
 print pi;
-
+/*
 if pi == 3 then
 	repeat 3 times
 		print pi + x;
@@ -14,10 +14,10 @@ elseif pi > 3 then
 else
 	print pi;
 endif
+*/
 
 struct queue1 = new queue;
 struct stack1 = new stack;
-*/
 struct list1 = new list;
 list1..insert(0,323);
 list1..insert(1,32344);
@@ -29,27 +29,25 @@ struct list4 = new list;
 list4..insert(0,323);
 list4..insert(1,323);
 
-//queue1..put(1);
+queue1..put(1);
 
-/*
-print pi;
+
 stack1..put( 1 );
 stack1..put( 1 );
-queue1..put( "1" );
+queue1..put( x + pi );
 list1..insert( 0, 1 );
 print stack1..len();
-print stack2..len();
 print stack1..take();
 print queue1..len();
 
 
-//list3..insert( 1 , "hola" ) ;
+list3..insert( 1 , 42 ) ;
 
-repeat 10 times
+repeat 30 times
 	var x as ( pi + x );
-	list1..insert( 0, x );
+	list1..insert( x, pi + x );
 endrepeat
 
 struct stack3 = new stack;
 stack3..put( 1 );
-var stack3 as 2;
+print queue1..take();

@@ -80,7 +80,7 @@ def actualizarCodigo(renglon):
 		else:
 			pintarCodigo(renglon-7 , renglon+7 , renglon)
 	pygame.display.update()
-	time.sleep(1)
+	time.sleep(0.3)
 
 class Pila:
 	def __init__(self,superficie):
@@ -114,8 +114,6 @@ class Pila:
 				caja = caja[0:6]
 				cont = letra.render(str(caja) , 0 , negro )
 				anchoLetra = cont.get_width()
-				idx = letra.render(str(index) , 0 ,negro)
-				xt = idx.get_width()
 				self.superficie.blit( cont , ( r[0]+(self.dimensionCaja[0]-anchoLetra)/2 , r[1] + self.dimensionCaja[1]/4 ) )
 		pygame.display.update()
 
@@ -195,8 +193,6 @@ class Cola:
 				caja = caja[0:6]
 				cont = letra.render(str(caja) , 0 , negro )
 				anchoLetra = cont.get_width()
-				idx = letra.render(str(index) , 0 ,negro)
-				xt = idx.get_width()
 				self.superficie.blit( cont , ( r[0]+(self.dimensionCaja[0]-anchoLetra)/2 , r[1] + self.dimensionCaja[1]/4 ) )
 		pygame.display.update()
 
@@ -229,7 +225,7 @@ class Cola:
 
 	def take(self):
 		if len(self.cola) > 0:
-			self.cola.take(0)
+			self.cola.pop(0)
 			self.pintar()
 			return True
 		else:
@@ -303,7 +299,10 @@ def reorganizarListas():
 	y = len(COLAS)*60+20
 	dx = canvas.get_width()-x
 	#definir altura
-	dy = (canvas.get_height()-y)/(numListas) - 20
+	if numListas > 0:
+		dy = (canvas.get_height()-y)/(numListas) - 20
+	else:
+		dy = canvas.get_height()-y - 20
 	for lista in LISTAS:
 		#LISTAS[lista][0].pintar(blanco)
 		index = LISTAS[lista][1]
@@ -484,9 +483,9 @@ class MyVisitor(MyLanguageVisitor):
 				elif ctx.methods().vardos() != None:
 					if ctx.methods().vardos().MTH() != None:
 						if table[ name ] == 'queue':
-							COLAS[ name ][ 0 ].put( str( ctx.methods().expr() ) )
+							COLAS[ name ][ 0 ].put( str( self.visitExpr( ctx.methods().expr(0) ) ) )
 						elif table[ name ] == 'stack':
-							PILAS[ name ].put( str( ctx.methods().expr() ) )
+							PILAS[ name ].put( str( self.visitExpr( ctx.methods().expr(0) ) ) )
 						else:
 							line = ctx.methods().vardos().MTH().getSymbol().line
 							col = ctx.methods().vardos().MTH().getSymbol().column
