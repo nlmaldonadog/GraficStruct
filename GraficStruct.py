@@ -16,6 +16,9 @@ rojo = (239,57,24)
 amarillo = (255,255,0)
 dimensionScreen = (1200,700)
 
+global hayError 
+hayError = False
+
 pygame.init()
 pygame.display.set_caption("Graficador de Estructuras")
 ventana = pygame.display.set_mode(dimensionScreen)
@@ -107,12 +110,20 @@ class Pila:
 			anchoLetra = cont.get_width()
 			if anchoLetra<self.dimensionCaja[0]:
 				self.superficie.blit( cont , ( r[0]+(self.dimensionCaja[0]-anchoLetra)/2 , r[1] + self.dimensionCaja[1]/4 ) )
+			else:
+				caja = caja[0:6]
+				cont = letra.render(str(caja) , 0 , negro )
+				anchoLetra = cont.get_width()
+				idx = letra.render(str(index) , 0 ,negro)
+				xt = idx.get_width()
+				self.superficie.blit( cont , ( r[0]+(self.dimensionCaja[0]-anchoLetra)/2 , r[1] + self.dimensionCaja[1]/4 ) )
 		pygame.display.update()
 
 	def put(self,text):
 		self.pila.append(text)
 		self.pintar()
 
+	#borrar y no retornar
 	def take(self):
 		if len(self.pila) > 0:
 			self.pila.pop(0)
@@ -121,6 +132,16 @@ class Pila:
 		else:
 			self.errorTake()
 			return False
+
+	#borrar y retornar
+	def pop(self):
+		if len(self.pila) > 0:
+			a = self.pila[len(self.pila)-1]
+			self.take()
+			return a
+		else:
+			return None
+
 
 	def errorTake(self):
 		#marco
@@ -170,11 +191,27 @@ class Cola:
 			anchoLetra = cont.get_width()
 			if anchoLetra<self.dimensionCaja[0]:
 				self.superficie.blit( cont , ( r[0]+(self.dimensionCaja[0]-anchoLetra)/2 , r[1] + self.dimensionCaja[1]/4 ) )
+			else:
+				caja = caja[0:6]
+				cont = letra.render(str(caja) , 0 , negro )
+				anchoLetra = cont.get_width()
+				idx = letra.render(str(index) , 0 ,negro)
+				xt = idx.get_width()
+				self.superficie.blit( cont , ( r[0]+(self.dimensionCaja[0]-anchoLetra)/2 , r[1] + self.dimensionCaja[1]/4 ) )
 		pygame.display.update()
 
 	def put(self,text):
 		self.cola.append(text)
 		self.pintar()
+
+	#borrar y retornar
+	def pop(self):
+		if len(self.cola) > 0:
+			a = self.cola[len(self.cola)-1]
+			self.take()
+			return a
+		else:
+			return None
 
 	def errorTake(self):
 		base = (60,10)
@@ -231,11 +268,19 @@ class Lista:
 			index += 1
 			if anchoLetra<self.dimensionCaja[0]:
 				self.superficie.blit( cont , ( r[0]+(self.dimensionCaja[0]-anchoLetra)/2 , r[1] + self.dimensionCaja[1]/4 ) )
+			else:
+				caja = caja[0:6]
+				cont = letra.render(str(caja) , 0 , negro )
+				anchoLetra = cont.get_width()
+				idx = letra.render(str(index) , 0 ,negro)
+				xt = idx.get_width()
+				self.superficie.blit( cont , ( r[0]+(self.dimensionCaja[0]-anchoLetra)/2 , r[1] + self.dimensionCaja[1]/4 ) )
+
 		pygame.display.update()
 
 	def add(self,index,texto):
 		self.lista.insert(index,texto)
-		self.pintar(amarillo)
+		self.pintar(azul)
 
 	def remove(self , index):
 		if index > 0 and index < len(self.lista)-1:
@@ -252,32 +297,48 @@ class Lista:
 	def leng( self ):
 		return len( self.lista )
 
-def newLista(name):
+def reorganizarListas():
 	numListas = len(LISTAS)
 	x = len(PILAS)*60
 	y = len(COLAS)*60+20
 	dx = canvas.get_width()-x
-	dy = canvas.get_height()-y if numListas == 0 else (canvas.get_height()/numListas)-y
-	canvasLista = canvas.subsurface(x,y,dx,dy)
-	letra = pygame.font.SysFont("Arial",18,False,True)
-	nameLista = letra.render(name , 0 , negro)
-	canvasLista.fill(amarillo)
-	canvas.blit(nameLista , ( (dx-x)/2 , y-20 ) )
-	LISTAS[name]=[ Lista(canvasLista) , numListas ]
-	pygame.display.update()
-
-def reorganizarListas():
-	numListas = len(LISTAS)
-	x = len(PILAS)*60
-	y = len(COLAS)*60
-	dy = canvas.get_height()-y if numListas == 0 else (canvas.get_height()-y)/numListas
+	#definir altura
+	dy = (canvas.get_height()-y)/(numListas) - 20
 	for lista in LISTAS:
+		#LISTAS[lista][0].pintar(blanco)
 		index = LISTAS[lista][1]
-		nuevoCanvas = canvas.subsurface( x , y + 20 + dy*index , canvas.get_width()-x , dy - 20 )
+		nuevoCanvas = canvas.subsurface( x , y+(dy+20)*LISTAS[lista][1] , dx , dy  )
 		nuevaLista = Lista(nuevoCanvas)
 		nuevaLista.lista = LISTAS[lista][0].lista
+		letra = pygame.font.SysFont("Arial",18,False,True)
+		nameLista = letra.render( LISTAS[lista][2] , 0 , negro)
+		xt = nameLista.get_width()
+		canvas.blit( nameLista , ( (canvas.get_width()-xt)/2 , y+(dy+20)*LISTAS[lista][1] -20 ) )
 		LISTAS[lista][0]=nuevaLista
 		LISTAS[lista][0].pintar(blanco)
+
+	pygame.display.update()
+
+def newLista(name):
+	numListas = len(LISTAS)
+	for lista in LISTAS:
+		LISTAS[lista][0].pintar(blanco)
+	x = len(PILAS)*60
+	y = len(COLAS)*60+20
+	dx = canvas.get_width()-x
+	#definir altura
+	dy = (canvas.get_height()-y)/(numListas+1) - 20
+
+	canvasLista = canvas.subsurface( x , y+numListas*dy + 20, dx , dy )
+	canvasLista.fill(blanco)
+	letra = pygame.font.SysFont("Arial",18,False,True)
+	nameLista = letra.render(name , 0 , negro)
+	xtexto = nameLista.get_width()
+	canvas.blit(nameLista , ( (dx-xtexto)/2 , y+numListas*dy ) )
+	LISTAS[name]=[ Lista(canvasLista) , numListas , name ]
+
+	reorganizarListas()
+
 	pygame.display.update()
 
 def newCola(name):
@@ -330,9 +391,20 @@ def abs( a ):
 class MyVisitor(MyLanguageVisitor):
 
 	def visitCommands(self, ctx):
+		global hayError
+		if hayError:
+			hayError = True
+			return None
 		return self.visitChildren(ctx)
 
 	def visitCommand(self, ctx):
+		global hayError
+		texto = ctx.getText();
+		#print ctx.getText()
+		if "missing" in texto or hayError :
+			hayError = True
+			return None
+		print ctx.getText()	
 		return self.visitChildren(ctx)
 
 	# Visit a parse tree produced by MyLanguageParser#declaration.

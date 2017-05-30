@@ -1,3 +1,4 @@
+/*
 var pi as 3.1415;
 var x as 1;
 print pi;
@@ -16,18 +17,34 @@ endif
 
 struct queue1 = new queue;
 struct stack1 = new stack;
+*/
 struct list1 = new list;
-struct stack2 = new stack;
+list1..insert(0,323);
+list1..insert(1,32344);
+list1..insert(2,323444444);
+struct list3 = new list;
+list3..insert(0,323);
+list3..insert(1,323);
+struct list4 = new list;
+list4..insert(0,323);
+list4..insert(1,323);
 
+//queue1..put(1);
+
+/*
 print pi;
 stack1..put( 1 );
 stack1..put( 1 );
-queue1..put( 1 );
+queue1..put( "1" );
 list1..insert( 0, 1 );
 print stack1..len();
 print stack2..len();
 print stack1..take();
 print queue1..len();
+
+
+//list3..insert( 1 , "hola" ) ;
+
 repeat 10 times
 	var x as ( pi + x );
 	list1..insert( 0, x );
