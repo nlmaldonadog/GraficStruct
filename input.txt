@@ -1,5 +1,6 @@
 /*
 var pi as 3.1415;
+var fernando as 18;
 var x as 1;
 print pi;
 
